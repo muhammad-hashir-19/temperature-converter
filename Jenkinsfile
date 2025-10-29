@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS'      
-}
+        nodejs 'NodeJS'
+    }
 
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Branch to build from')
-        string(name: &#39;STUDENT_NAME&#39;, defaultValue: &#39;your name&#39;) //provide your name here, no name, no marks
+        string(name: 'STUDENT_NAME', defaultValue: 'M.Hashir', description: 'Provide your name here, no name, no marks')
         choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'prod'], description: 'Select environment')
         booleanParam(name: 'RUN_TESTS', defaultValue: true, description: 'Run Jest tests after build')
     }
@@ -18,6 +18,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 echo "Checking out branch: ${params.BRANCH_NAME}"
@@ -34,13 +35,13 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo " Building version ${APP_VERSION} for ${params.ENVIRONMENT} environment"
+                echo "Building version ${APP_VERSION} for ${params.ENVIRONMENT} environment"
                 bat '''
-                    echo Simulating build process...
-                    if not exist build mkdir build
-                    copy *.js build
-                    echo Build completed successfully!
-                    echo App version: %APP_VERSION% > build\\version.txt
+                echo Simulating build process...
+                if not exist build mkdir build
+                copy src\\*.js build\\
+                echo Build completed successfully!
+                echo App version: %APP_VERSION% > build\\version.txt
                 '''
             }
         }
@@ -75,11 +76,10 @@ pipeline {
             deleteDir()
         }
         success {
-            echo " Pipeline succeeded! Version ${APP_VERSION} built and tested."
+            echo "Pipeline succeeded! Version ${APP_VERSION} built and tested."
         }
         failure {
-            echo " Pipeline failed! Check console output for details."
+            echo "Pipeline failed! Check console output for details."
         }
     }
 }
-
